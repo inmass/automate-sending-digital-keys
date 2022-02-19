@@ -14,8 +14,7 @@ $query = $wpdb->get_results("SELECT * FROM $tablename");
         <option value="key_type">Key type</option>
         <option value="activation_key">Key</option>
     </select>
-    <label class="screen-reader-text" for="post-search-input">Rechercher des pages:</label>
-    <input type="search" id="search_query" name="search_query" placeholder="Rechercher des projets" value="" disabled>
+    <input type="search" id="search_query" name="search_query" placeholder="Query here" value="" disabled>
     <br><br>
 </p>
 
@@ -33,7 +32,7 @@ $query = $wpdb->get_results("SELECT * FROM $tablename");
         </thead>
 
         <tbody id="content" >
-            <?php key_per_page(1,20,null); ?>
+            <?php key_per_page(1,20,null,null); ?>
         </tbody>
     </table>
 </div>
@@ -44,6 +43,34 @@ $query = $wpdb->get_results("SELECT * FROM $tablename");
 
 <!-- creating js functions -->
 <script>
+    // check if request came from keys types to filter by type
+    const queryString = window.location.search;
+    const urlParams = new URLSearchParams(queryString);
+
+    if (urlParams.get('to_redirect')) {
+        console.log('redirecting');
+        // redirect to add key page
+        if (urlParams.get('to_redirect') == 'filter_by_key_type') {
+            var templateUrl = '<?= plugin_dir_url( __FILE__ ); ?>get_data.php';
+            jQuery.ajax({
+                type:'GET',
+                data:{
+                    page_type: 'activation_keys',
+                    search_query:urlParams.get('search_query'),
+                    search_by:'key_type'
+                },
+                url:templateUrl,
+                success: function(value) {
+                    //console.log(value);
+                    jQuery('#content').html('');
+                    jQuery('#content').html(value);
+                }
+            })
+        }
+    }
+    // check if request came from keys types to filter by type
+
+
     jQuery('#search_by').change(function(){
         if (jQuery(this).val() == "") {
             jQuery('#search_query').attr('disabled', true);
@@ -61,6 +88,7 @@ $query = $wpdb->get_results("SELECT * FROM $tablename");
         jQuery.ajax({
             type:'GET',
             data:{
+                page_type: 'activation_keys',
                 search_query:jQuery("#search_query").val(),
                 search_by:jQuery("#search_by").val()
             },
@@ -92,6 +120,7 @@ $query = $wpdb->get_results("SELECT * FROM $tablename");
         jQuery.ajax({
                 type:'GET',
                 data:{
+                    page_type: 'activation_keys',
                     page_no:id,
                     search_query:search_query,
                     search_by:search_by

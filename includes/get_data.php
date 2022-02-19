@@ -13,8 +13,17 @@ include('functions.php');
 global $wpdb;
 
 
-if (isset($_GET['page_no'])) {
-    key_per_page($_GET['page_no'],20,$_GET["search_query"],$_GET["search_by"]);
-} else {
-    key_per_page(1,20,$_GET["search_query"],$_GET["search_by"]);
+if ($_GET['page_type'] == 'activation_keys') {
+    if (isset($_GET['page_no'])) {
+        key_per_page($_GET['page_no'],20,$_GET["search_query"],$_GET["search_by"]);
+    } else {
+        key_per_page(1,20,$_GET["search_query"],$_GET["search_by"]);
+    }
+} else if ($_GET['page_type'] == 'keys_types') {
+    if (isset($_GET['page_no'])) {
+        key_types_per_page($_GET['page_no'],20,$_GET["search_query"]);
+    } else {
+        key_types_per_page(1,20,$_GET["search_query"]);
+    }
+    #
 }
