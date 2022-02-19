@@ -14,7 +14,7 @@ global $wpdb;
 
 
 if (isset($_GET['page_no'])) {
-    key_per_page($_GET['page_no'],1,$_GET["search_query"],$_GET["search_by"]);
+    key_per_page($_GET['page_no'],20,$_GET["search_query"],$_GET["search_by"]);
 } else {
-    key_per_page(1,1,$_GET["search_query"],$_GET["search_by"]);
+    key_per_page(1,20,$_GET["search_query"],$_GET["search_by"]);
 }

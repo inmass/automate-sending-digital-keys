@@ -20,6 +20,7 @@ $query = $wpdb->get_results("SELECT * FROM $tablename");
 </p>
 
 <div>
+    <h1>Activation keys</h1>
     <table width='100%' border='1' class="wp-list-table widefat fixed striped pages " style='border-collapse: collapse;'>
         <thead>
             <tr>
@@ -32,7 +33,7 @@ $query = $wpdb->get_results("SELECT * FROM $tablename");
         </thead>
 
         <tbody id="content" >
-            <?php key_per_page(1,1,null); ?>
+            <?php key_per_page(1,20,null); ?>
         </tbody>
     </table>
 </div>
