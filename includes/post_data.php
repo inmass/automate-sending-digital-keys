@@ -32,7 +32,8 @@ if ($_POST['form_type'] == "add_key") {
     $wpdb->insert(
         $table,
         array(
-            'title' => $_POST['title']
+            // save title in upper case
+            'title' => strtoupper($_POST['title'])
         )
     );
     echo "success";

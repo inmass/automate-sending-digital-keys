@@ -91,7 +91,7 @@ function createtable_sec()
 
     $sql = "CREATE TABLE $table_name (
             id mediumint(9) NOT NULL AUTO_INCREMENT PRIMARY KEY,
-            activation_key varchar(255) NULL,
+            activation_key varchar(255) NULL UNIQUE,
             sent_to BIT DEFAULT 0 NOT NULL,
             sell_date DATETIME NULL
         ) $charset_collate;";
@@ -110,7 +110,7 @@ function createtable_third()
 
     $sql = "CREATE TABLE $table_name (
             id mediumint(9) NOT NULL AUTO_INCREMENT PRIMARY KEY,
-            title varchar(255) NULL
+            title varchar(255) NULL UNIQUE
         ) $charset_collate;";
 
     require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
@@ -118,9 +118,6 @@ function createtable_third()
 }
 
 
-register_deactivation_hook(__FILE__,"dropTable_one");
-register_deactivation_hook(__FILE__,"dropTable_two");
-register_deactivation_hook(__FILE__,"dropTable_three");
 
 function dropTable_one()
 {
@@ -130,7 +127,7 @@ function dropTable_one()
     $sql = "DROP TABLE IF EXISTS $table_name";
 
     require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
-    dbDelta( $sql );
+    $wpdb->query($sql);
 }
 function dropTable_two()
 {
@@ -141,7 +138,7 @@ function dropTable_two()
     $sql = "DROP TABLE IF EXISTS $table_name";
 
     require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
-    dbDelta( $sql );
+    $wpdb->query($sql);
 }
 function dropTable_three()
 {
@@ -152,5 +149,9 @@ function dropTable_three()
     $sql = "DROP TABLE IF EXISTS $table_name";
 
     require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
-    dbDelta( $sql );
+    $wpdb->query($sql);
 }
+
+register_uninstall_hook(__FILE__,"dropTable_one");
+register_uninstall_hook(__FILE__,"dropTable_two");
+register_uninstall_hook(__FILE__,"dropTable_three");
