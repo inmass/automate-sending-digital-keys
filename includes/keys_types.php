@@ -13,7 +13,7 @@ $query = $wpdb->get_results("SELECT * FROM $tablename");
 </p>
 
 <div>
-    <h1>Activation keys</h1>
+    <h1>Activation keys types</h1>
     <table width='100%' border='1' class="wp-list-table widefat fixed striped pages " style='border-collapse: collapse;'>
         <thead>
             <tr>
@@ -29,7 +29,7 @@ $query = $wpdb->get_results("SELECT * FROM $tablename");
     </table>
 </div>
 
-<a href="<?php echo admin_url('admin.php?page=add-key'); ?>">Add new key</a>
+<a href="<?php echo admin_url('admin.php?page=add-key-type'); ?>">Add new key type</a>
 
 
 

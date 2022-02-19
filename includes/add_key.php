@@ -16,6 +16,7 @@ $query = $wpdb->get_results("SELECT `title` FROM $tablename");
                 <option value="<?= $key->title ?>"><?= $key->title ?></option>
             <?php } ?>
         </select>
+        <a href="<?php echo admin_url('admin.php?page=add-key-type'); ?>">Add new key type</a>
         <br><br>
         <label for="activation_key">Activation key</label>
         <br>

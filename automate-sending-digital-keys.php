@@ -155,3 +155,6 @@ function dropTable_three()
 register_uninstall_hook(__FILE__,"dropTable_one");
 register_uninstall_hook(__FILE__,"dropTable_two");
 register_uninstall_hook(__FILE__,"dropTable_three");
+
+
+// add woocommerce orders hooks
