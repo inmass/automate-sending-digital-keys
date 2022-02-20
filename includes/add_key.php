@@ -22,12 +22,13 @@ $query = $wpdb->get_results("SELECT `title` FROM $tablename");
         <br>
         <input type="text" name="activation_key" id="activation_key" required>
         <br><br>
-        <label for="key_count">Key count</label>
+        <label for="key_count">Number of times for the key to be used (leave empty to usit with no count limit)</label>
         <br>
-        <input type="number" name="key_count" id="key_count" step="1" min="1" value="1" required>
+        <input type="number" name="key_count" id="key_count" step="1" min="1">
         <br><br>
         <input type="submit" value="Add key">
     </form>
+    <div id="error" style="color: red;"></div>
 </div>
 
 
@@ -35,10 +36,14 @@ $query = $wpdb->get_results("SELECT `title` FROM $tablename");
 
     let form = document.getElementById('add_key');
     form.addEventListener('submit', function(e) {
+        document.getElementById('error').innerHTML = "";
         e.preventDefault();
         let key_type = document.getElementById('key_type').value;
         let activation_key = document.getElementById('activation_key').value;
         let key_count = document.getElementById('key_count').value;
+        if (key_count == "") {
+            key_count = null;
+        }
         let formData = new FormData(form);
         formData.append('form_type', 'add_key');
         formData.append('key_type', key_type);
@@ -52,8 +57,10 @@ $query = $wpdb->get_results("SELECT `title` FROM $tablename");
             contentType: false,
             success:function(data) {
                 console.log(data);
-                if (data == 'success') {
+                if (data.includes('success')) {
                     window.location.href = 'admin.php?page=activation-keys';
+                } else {
+                    document.getElementById('error').innerHTML = data;
                 }
             }
         });

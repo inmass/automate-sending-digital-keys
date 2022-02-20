@@ -30,11 +30,11 @@ function key_per_page($page, $count_per_page, $search_query = null, $search_by =
 
     if ($search_query == null) {
         $entriesList = $wpdb->get_results(
-            "SELECT * FROM $tablename order by id asc LIMIT $offset, $total_records_per_page"
+            "SELECT * FROM $tablename order by -id asc LIMIT $offset, $total_records_per_page"
         );
     } else {
         $entriesList = $wpdb->get_results(
-            "SELECT * FROM $tablename  WHERE lower(`$search_by`) LIKE lower('%$search_query%') order by id asc LIMIT $offset, $total_records_per_page"
+            "SELECT * FROM $tablename  WHERE lower(`$search_by`) LIKE lower('%$search_query%') order by -id asc LIMIT $offset, $total_records_per_page"
         );
     }
 
@@ -140,11 +140,11 @@ function key_types_per_page($page, $count_per_page, $search_query = null, $searc
 
     if ($search_query == null) {
         $entriesList = $wpdb->get_results(
-            "SELECT * FROM $tablename order by id asc LIMIT $offset, $total_records_per_page"
+            "SELECT * FROM $tablename order by -id asc LIMIT $offset, $total_records_per_page"
         );
     } else {
         $entriesList = $wpdb->get_results(
-            "SELECT * FROM $tablename  WHERE lower(`title`) LIKE lower('%$search_query%') order by id asc LIMIT $offset, $total_records_per_page"
+            "SELECT * FROM $tablename  WHERE lower(`title`) LIKE lower('%$search_query%') order by -id asc LIMIT $offset, $total_records_per_page"
         );
     }
 

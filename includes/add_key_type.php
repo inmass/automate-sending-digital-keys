@@ -8,6 +8,7 @@
         <br><br>
         <input type="submit" value="Add key">
     </form>
+    <div id="error" style="color: red;"></div>
 </div>
 
 
@@ -15,6 +16,7 @@
 
     let form = document.getElementById('add_key_type');
     form.addEventListener('submit', function(e) {
+        document.getElementById('error').innerHTML = "";
         e.preventDefault();
         let title = document.getElementById('title').value;
         let formData = new FormData(form);
@@ -28,8 +30,10 @@
             contentType: false,
             success:function(data) {
                 console.log(data);
-                if (data == 'success') {
+                if (data.includes('success')) {
                     window.location.href = 'admin.php?page=keys-types';
+                } else {
+                    document.getElementById('error').innerHTML = data;
                 }
             }
         });

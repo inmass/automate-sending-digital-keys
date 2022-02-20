@@ -1,7 +1,7 @@
 <?php 
 /*
 Plugin Name: Automate sending digital keys
-Plugin URI: https://github.com/inmass/asdk
+Plugin URI: https://github.com/inmass/automate-sending-digital-keys
 Description: Automate sending digital keys
 Version: 1.0.0
 Author: iinmass
@@ -69,7 +69,7 @@ function createtable()
 
     $sql = "CREATE TABLE $table_name (
                 id mediumint(9) NOT NULL AUTO_INCREMENT PRIMARY KEY,
-                activation_key varchar(255) NULL,
+                activation_key varchar(255) NULL UNIQUE,
                 key_type varchar(255) NULL,
                 key_count int(11) NULL,
                 used BIT DEFAULT 0 NOT NULL
@@ -91,7 +91,7 @@ function createtable_sec()
 
     $sql = "CREATE TABLE $table_name (
             id mediumint(9) NOT NULL AUTO_INCREMENT PRIMARY KEY,
-            activation_key varchar(255) NULL UNIQUE,
+            activation_key varchar(255) NULL,
             sent_to BIT DEFAULT 0 NOT NULL,
             sell_date DATETIME NULL
         ) $charset_collate;";
@@ -155,6 +155,48 @@ function dropTable_three()
 register_uninstall_hook(__FILE__,"dropTable_one");
 register_uninstall_hook(__FILE__,"dropTable_two");
 register_uninstall_hook(__FILE__,"dropTable_three");
+
+
+// add woocommerce product hooks
+// The code for displaying WooCommerce Product Custom Fields
+add_action( 'woocommerce_product_options_general_product_data', 'woocommerce_product_custom_fields' ); 
+// Following code Saves  WooCommerce Product Custom Fields
+add_action( 'woocommerce_process_product_meta', 'woocommerce_product_custom_fields_save' );
+
+function woocommerce_product_custom_fields () {
+    global $woocommerce, $post, $wpdb;
+    echo '<div class=" product_custom_field ">';
+
+    $keys_types_table = $wpdb->prefix."asdk_keys_types";
+    $keys_types_query = $wpdb->get_results("SELECT `title` FROM $keys_types_table");
+    $keys_types = array(
+        '' => 'Select key type'
+    );
+    foreach ($keys_types_query as $keys_type) {
+        $keys_types[$keys_type->title] = $keys_type->title;
+    }
+
+    woocommerce_wp_select(
+        array(
+            'id' => '_asdk_product_type',
+            'placeholder' => 'ASDK product type',
+            'label' => __('ASDK product type', 'woocommerce'),
+            'options' => $keys_types
+        )
+    );
+    
+    echo '<a href="'. admin_url("admin.php?page=add-key-type") .'" style="margin-left: 10px;">Add new key type</a>';
+
+    echo '</div>';
+}
+
+function woocommerce_product_custom_fields_save($post_id)
+{
+    // Custom Product Text Field
+    $woocommerce_asdk_product_type = $_POST['_asdk_product_type'];
+    if (!empty($woocommerce_asdk_product_type))
+        update_post_meta($post_id, '_asdk_product_type', esc_attr($woocommerce_asdk_product_type));
+}
 
 
 // add woocommerce orders hooks
