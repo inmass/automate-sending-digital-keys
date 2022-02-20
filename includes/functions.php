@@ -157,19 +157,24 @@ function key_types_per_page($page, $count_per_page, $search_query = null, $searc
             $keys_count = $wpdb->get_results(
                 "SELECT COUNT(*) AS total_keys FROM $keys_table WHERE key_type = '$title'"
             );
+            // get count of wc products with meta_key = key_type
+            $wc_products_count = $wpdb->get_results(
+                "SELECT COUNT(*) AS total_wc_products FROM wp_postmeta WHERE meta_key = '_asdk_product_type' AND meta_value = '$title'"
+            );
 
             $output .=
                 "<tr>
                     <td>" .$id ."</td>
                     <td>" .$title ."</td>
                     <td><a href='admin.php?page=activation-keys&to_redirect=filter_by_key_type&page_type=activation_keys&search_query=".$title."&search_by=key_type'>" .$keys_count[0]->total_keys."</a></td>
+                    <td>" .$wc_products_count[0]->total_wc_products ."</td>
                 </tr>
             ";
             $count++;
         }
         $output .= '
             <tr>
-                <td colspan="3">
+                <td colspan="4">
                     <ul class="pagination" style="display:flex;justify-content: space-between;">
                         <li >
         ';

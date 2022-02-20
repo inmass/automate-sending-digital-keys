@@ -107,7 +107,8 @@ function createtable_third()
     $plugin_name_db_version = '1.0.0';
     $table_name = $wpdb->prefix . "asdk_keys_types"; 
     $charset_collate = $wpdb->get_charset_collate();
-
+    
+    
     $sql = "CREATE TABLE $table_name (
             id mediumint(9) NOT NULL AUTO_INCREMENT PRIMARY KEY,
             title varchar(255) NULL UNIQUE
@@ -115,46 +116,17 @@ function createtable_third()
 
     require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
     dbDelta($sql);
+    // add two rows to the table if table is empty
+    if($wpdb->get_var("SELECT COUNT(*) FROM $table_name") == 0) {
+        $wpdb->insert($table_name, array('title' => 'WINDOWS10PRO'));
+        $wpdb->insert($table_name, array('title' => 'WINDOWS10FAMILY'));
+        $wpdb->insert($table_name, array('title' => 'OFFICE2021PRO'));
+    }
+    
 }
 
 
 
-function dropTable_one()
-{
-    global $wpdb;
-    # code...
-    $table_name = $wpdb->prefix . "asdk_keys";
-    $sql = "DROP TABLE IF EXISTS $table_name";
-
-    require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
-    $wpdb->query($sql);
-}
-function dropTable_two()
-{
-    global $wpdb;
-    # code...
-    $table_name = $wpdb->prefix . "asdk_keys_users";
-
-    $sql = "DROP TABLE IF EXISTS $table_name";
-
-    require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
-    $wpdb->query($sql);
-}
-function dropTable_three()
-{
-    global $wpdb;
-    # code...
-    $table_name = $wpdb->prefix . "asdk_keys_types";
-
-    $sql = "DROP TABLE IF EXISTS $table_name";
-
-    require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
-    $wpdb->query($sql);
-}
-
-register_uninstall_hook(__FILE__,"dropTable_one");
-register_uninstall_hook(__FILE__,"dropTable_two");
-register_uninstall_hook(__FILE__,"dropTable_three");
 
 
 // add woocommerce product hooks
@@ -200,3 +172,25 @@ function woocommerce_product_custom_fields_save($post_id)
 
 
 // add woocommerce orders hooks
+
+
+// delete plugin
+function dropTables()
+{
+    global $wpdb;
+    # code...
+    require(ABSPATH . 'wp-admin/includes/upgrade.php');
+
+    $table_name = $wpdb->prefix . "asdk_keys";
+    $sql = "DROP TABLE IF EXISTS $table_name";
+    $wpdb->query($sql);
+    $table_name = $wpdb->prefix . "asdk_keys_types";
+    $sql = "DROP TABLE IF EXISTS $table_name";
+    $wpdb->query($sql);
+    $table_name = $wpdb->prefix . "asdk_keys_users";
+    $sql = "DROP TABLE IF EXISTS $table_name";
+    $wpdb->query($sql);
+
+}
+
+register_uninstall_hook(__FILE__,"dropTables");

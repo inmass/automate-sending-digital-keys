@@ -20,6 +20,7 @@ $query = $wpdb->get_results("SELECT * FROM $tablename");
                 <th>Id</th>
                 <th>Title</th>
                 <th>Keys count</th>
+                <th>Products with this type</th>
             </tr>
         </thead>
 
