@@ -52,4 +52,23 @@ if ($_POST['form_type'] == "add_key") {
     }
     echo $response;
 
+} else if ($_POST['form_type'] == "edit_key") {
+    $table = $wpdb->prefix . "asdk_keys";
+    // if ($_POST['used'] == )
+    $result = $wpdb->update(
+        $table,
+        array(
+            'key_count' => $_POST['count'],
+            'used' => boolval($_POST['used']),
+        ),
+        array(
+            'id' => $_POST['key_id']
+        )
+    );
+    if ($result) {
+        $response = "success";
+    } else {
+        $response = $result;
+    }
+    echo $response;
 }

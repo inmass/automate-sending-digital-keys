@@ -22,9 +22,9 @@ $query = $wpdb->get_results("SELECT `title` FROM $tablename");
         <br>
         <input type="text" name="activation_key" id="activation_key" required>
         <br><br>
-        <label for="key_count">Number of times for the key to be used (leave empty to usit with no count limit)</label>
+        <label for="key_count">Number of times for the key to be used (type in -1 to use it with no count limit)</label>
         <br>
-        <input type="number" name="key_count" id="key_count" step="1" min="1">
+        <input type="number" name="key_count" id="key_count" step="1" required>
         <br><br>
         <input type="submit" value="Add key">
     </form>

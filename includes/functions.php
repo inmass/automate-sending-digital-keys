@@ -47,21 +47,42 @@ function key_per_page($page, $count_per_page, $search_query = null, $search_by =
             $key_type = $entry->key_type;
             $key_count = $entry->key_count;
             $used = $entry->used;
+            if ($used == 1) {
+                $used = "Yes";
+            } else {
+                $used = "No";
+            }
 
             $output .=
                 "<tr>
                     <td>" .$id ."</td>
                     <td>" .$activation_key ."</td>
                     <td>" .$key_type ."</td>
-                    <td>" .$key_count ."</td>
-                    <td>" .$used ."</td>
+                    <td id='key-count-$id'>
+                        <p id='key-count-text-$id'>$key_count</p>
+                        <input type='number' id='key-count-input-$id' value='$key_count' style='display:none;'>
+                    </td>
+                    <td id='key-used-$id'>
+                        <p id='key-used-text-$id'>$used</p>
+                        <select id='key-used-input-$id' style='display:none;'>
+                            <option value='' selected disabled></option>
+                            <option value='1'>Yes</option>
+                            <option value='0'>No</option>
+                        </select>
+
+                    </td>
+                    <td>
+                        <button class='btn btn-primary' id='edit-button-$id' onclick='edit_key($id)'>Edit</button>
+                        <button class='btn btn-primary' id='cancel-button-$id' onclick='cancel_key($id)' style='display:none;'>Cancel</button>
+                        <button class='btn btn-primary' id='save-button-$id' onclick='save_key($id)' style='display:none;'>Save</button>
+                    </td>
                 </tr>
             ";
             $count++;
         }
         $output .= '
             <tr>
-                <td colspan="5">
+                <td colspan="6">
                     <ul class="pagination" style="display:flex;justify-content: space-between;">
                         <li >
         ';

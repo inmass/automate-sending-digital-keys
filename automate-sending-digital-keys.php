@@ -174,6 +174,128 @@ function woocommerce_product_custom_fields_save($post_id)
         update_post_meta($post_id, '_asdk_product_type', esc_attr($woocommerce_asdk_product_type));
 }
 
+// add order hooks
+// check whenever order status is changed from pending to processing
+add_action( 'woocommerce_order_status_pending_to_processing', 'asdk_order_status_pending_to_processing', 10, 2 );
+
+function asdk_order_status_pending_to_processing($order_id, $order = false)
+{
+    // setting up $keys_by_type
+    global $wpdb;
+
+    $asdk_keys = $wpdb->prefix."asdk_keys";
+    $asdk_keys_users = $wpdb->prefix."asdk_keys_users";
+    $asdk_keys_types = $wpdb->prefix."asdk_keys_types";
+
+    $asdk_keys_types_query = $wpdb->get_results("SELECT * FROM $asdk_keys_types");
+
+    $keys_by_type = array();
+    foreach ($asdk_keys_types_query as $key_type) {
+        $keys_by_type[$key_type->title] = array();
+    }
+
+    foreach ($keys_by_type as $key_type => $keys) {
+        $asdk_key_query = $wpdb->get_results("SELECT * FROM $asdk_keys WHERE `key_type` = '$key_type'");
+        if (count($asdk_key_query) > 0) {
+            foreach ($asdk_key_query as $key) {
+                $keys_by_type[$key_type][] = $key->activation_key;
+            }
+        }
+    }
+    // remove key_type from keys_by_type if it is empty
+    foreach ($keys_by_type as $key_type => $keys) {
+        if (count($keys) == 0) {
+            unset($keys_by_type[$key_type]);
+        }
+    }
+    // setting up $keys_by_type
+
+
+    // setting up $products_data
+    // get the order
+    $order = wc_get_order( $order_id );
+    // get the order items
+    $items = $order->get_items();
+    // get the order items product ids and types
+    $products_data = array_map(
+        function($item) {
+            $array = array();
+            $array['product_id'] = $item->get_product_id();
+            $array['product_title'] = $item->get_name();
+            // $array['product_quantity'] = $item->get_quantity();
+            $array['product_quantity'] = 2;
+            $array['asdk_type'] = get_post_meta($item->get_product_id(), '_asdk_product_type', true);
+            return $array;
+        },
+        $items
+    );
+    $buyer = array(
+        'name' => $order->get_billing_first_name() . ' ' . $order->get_billing_last_name(),
+        'email' => $order->get_billing_email(),
+    );
+    // setting up $products_data and $buyer
+
+    $available_keys = array();
+    foreach ($keys_by_type as $key_type => $keys) {
+        $available_keys[] = $key_type;
+    }
+
+
+    foreach ($products_data as $product_data) {
+        // check if product asdk_type is in keys_by_type
+        if ( array_key_exists($product_data["asdk_type"], $keys_by_type)) {
+
+            $quantity = $product_data["product_quantity"];
+            $keys_count = count($keys_by_type[$product_data["asdk_type"]]);
+
+            echo $product_data["product_title"] . ": " . $quantity . "<br>";
+            echo "Product type: " . $product_data["asdk_type"] . "<br>";
+            echo "Available keys for $product_data[asdk_type]: " . $keys_count . "<br>";
+
+            // if there are enough keys for this product type
+            if ($quantity > $keys_count) {
+
+                echo "Not enough keys for $product_data[asdk_type]<br>";
+                // notify admin that the keys were not sent to the buyer
+                $subject = "Keys for $order_id were not sent to the buyer";
+                $message = "There are not enough keys for $product_data[asdk_type] for order $order_id. Please check the order and send the keys manually.";
+                // wp_mail( get_option('admin_email'), $subject, $message );
+                $result = wp_mail( 'inmass.idbel@gmail.com', $subject, $message );
+                var_dump($result);
+                exit;
+                // notify admin that the keys were not sent to the buyer
+            } else {
+
+                echo "Enough keys for $product_data[asdk_type]<br>";
+
+            }
+        } else {
+            echo "Product type: " . $product_data["asdk_type"] . " is not in keys_by_type";
+        }
+    }
+    
+    echo "<pre>";
+    echo "--------";
+    echo "Buyer: ";
+    var_dump($buyer);
+    echo "--------";
+    echo "keys by type: ";
+    var_dump($keys_by_type);
+    echo "--------";
+    echo "available keys: ";
+    var_dump($available_keys);
+    echo "--------";
+    echo "products data: ";
+    var_dump($products_data);
+    echo "</pre>";
+    exit;
+}
+
+
+// check whenever the payment is completed
+// add_action( 'woocommerce_payment_complete', 'asdk_payment_complete', 10, 1 );
+// add order hooks
+
 
 // add woocommerce orders hooks
 
