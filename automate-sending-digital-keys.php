@@ -177,6 +177,8 @@ function woocommerce_product_custom_fields_save($post_id)
 // add order hooks
 // check whenever order status is changed from pending to processing
 add_action( 'woocommerce_order_status_pending_to_processing', 'asdk_order_status_pending_to_processing', 10, 2 );
+// check whenever order status is changed from pending to on hold
+add_action( 'woocommerce_order_status_pending_to_on-hold', 'asdk_order_status_pending_to_on_hold', 10, 1 ); 
 
 function asdk_order_status_pending_to_processing($order_id, $order = false)
 {
@@ -222,8 +224,8 @@ function asdk_order_status_pending_to_processing($order_id, $order = false)
             $array = array();
             $array['product_id'] = $item->get_product_id();
             $array['product_title'] = $item->get_name();
-            // $array['product_quantity'] = $item->get_quantity();
-            $array['product_quantity'] = 2;
+            $array['product_quantity'] = $item->get_quantity();
+            // $array['product_quantity'] = 2;
             $array['asdk_type'] = get_post_meta($item->get_product_id(), '_asdk_product_type', true);
             return $array;
         },
@@ -246,6 +248,7 @@ function asdk_order_status_pending_to_processing($order_id, $order = false)
         if ( array_key_exists($product_data["asdk_type"], $keys_by_type)) {
 
             $quantity = $product_data["product_quantity"];
+            $keys = $keys_by_type[$product_data["asdk_type"]];
             $keys_count = count($keys_by_type[$product_data["asdk_type"]]);
 
             echo $product_data["product_title"] . ": " . $quantity . "<br>";
@@ -255,22 +258,78 @@ function asdk_order_status_pending_to_processing($order_id, $order = false)
             // if there are enough keys for this product type
             if ($quantity > $keys_count) {
 
-                echo "Not enough keys for $product_data[asdk_type]<br>";
                 // notify admin that the keys were not sent to the buyer
                 $subject = "Keys for $order_id were not sent to the buyer";
                 $message = "There are not enough keys for $product_data[asdk_type] for order $order_id. Please check the order and send the keys manually.";
-                // wp_mail( get_option('admin_email'), $subject, $message );
-                $result = wp_mail( 'inmass.idbel@gmail.com', $subject, $message );
-                var_dump($result);
-                exit;
+                wp_mail( get_option('admin_email'), $subject, $message );
                 // notify admin that the keys were not sent to the buyer
+
             } else {
 
-                echo "Enough keys for $product_data[asdk_type]<br>";
+                // get a keys for the product
+                $keys_and_quantity = array();
+                foreach ($keys as $key) {
+                    $query = $wpdb->get_results("
+                        SELECT * 
+                        FROM $asdk_keys 
+                        WHERE  `activation_key` = '$key' AND `used` = 0 AND `key_count` >= $quantity
+                        OR  `activation_key` = '$key' AND `used` = 0 AND `key_count` = -1
+                    ");
+                    foreach ($query as $key_data) {
+                        $keys_and_quantity[] = array(
+                            'key' => $query[0]->activation_key,
+                            'quantity' => $query[0]->key_count
+                        );
+                    }
+                }
 
+                if ($quantity <= count($keys_and_quantity)) {
+                    $keys_and_quantity = array_slice($keys_and_quantity, 0, $quantity);
+                    var_dump    ($keys_and_quantity);
+                    $keys_string = "";
+
+                    foreach ($keys_and_quantity as $key_and_quantity) {
+                        $keys_string .= $key_and_quantity['key'] . " ";
+                    }
+
+                    // send $quantity keys to the buyer
+                    $subject = $product_data["product_title"]." - $quantity keys";
+                    if ($quantity == 1) {
+                        $message = "Here is your key for $product_data[product_title]:<br><br>";
+                    } else {
+                        $message = "Here are your keys for $product_data[product_title]:<br><br>";
+                    }
+                    $message .= $keys_string;
+                    wp_mail( $buyer['email'], $subject, $message );
+
+                    // update key quantity in $keys_and_quantity
+                    foreach ($keys_and_quantity as $key_and_quantity) {
+                        $key_and_quantity['quantity'] -= $quantity;
+                        $wpdb->update(
+                            $asdk_keys,
+                            array(
+                                'key_count' => $key_and_quantity['quantity'],
+                            ),
+                            array(
+                                'activation_key' => $key_and_quantity['key']
+                            )
+                        );
+                    }
+                    // send $quantity keys to the buyer
+
+                } else {
+                    // notify admin that the keys were not sent to the buyer
+                    $subject = "Keys for $order_id were not sent to the buyer";
+                    $message = "There are not enough keys for $product_data[asdk_type] for order $order_id. Please check the order and send the keys manually.";
+                    wp_mail( get_option('admin_email'), $subject, $message );
+                    // notify admin that the keys were not sent to the buyer
+                }
             }
         } else {
-            echo "Product type: " . $product_data["asdk_type"] . " is not in keys_by_type";
+            // notify admin that the keys were not sent to the buyer
+            $subject = "Keys for $order_id were not sent to the buyer";
+            $message = "There are no keys for $product_data[asdk_type] for order $order_id. Please check the order and send the keys manually.";
+            wp_mail( get_option('admin_email'), $subject, $message );
         }
     }
     
@@ -289,6 +348,10 @@ function asdk_order_status_pending_to_processing($order_id, $order = false)
     var_dump($products_data);
     echo "</pre>";
     exit;
+}
+
+function asdk_order_status_pending_to_on_hold( $order_id ) {
+    asdk_order_status_pending_to_processing( $order_id );
 }
 
 
