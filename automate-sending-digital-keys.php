@@ -333,21 +333,21 @@ function asdk_order_status_pending_to_processing($order_id, $order = false)
         }
     }
     
-    echo "<pre>";
-    echo "--------";
-    echo "Buyer: ";
-    var_dump($buyer);
-    echo "--------";
-    echo "keys by type: ";
-    var_dump($keys_by_type);
-    echo "--------";
-    echo "available keys: ";
-    var_dump($available_keys);
-    echo "--------";
-    echo "products data: ";
-    var_dump($products_data);
-    echo "</pre>";
-    exit;
+    // echo "<pre>";
+    // echo "--------";
+    // echo "Buyer: ";
+    // var_dump($buyer);
+    // echo "--------";
+    // echo "keys by type: ";
+    // var_dump($keys_by_type);
+    // echo "--------";
+    // echo "available keys: ";
+    // var_dump($available_keys);
+    // echo "--------";
+    // echo "products data: ";
+    // var_dump($products_data);
+    // echo "</pre>";
+    // exit;
 }
 
 function asdk_order_status_pending_to_on_hold( $order_id ) {
