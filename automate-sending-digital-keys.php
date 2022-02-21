@@ -304,7 +304,9 @@ function asdk_order_status_pending_to_processing($order_id, $order = false)
 
                     // update key quantity in $keys_and_quantity
                     foreach ($keys_and_quantity as $key_and_quantity) {
-                        $key_and_quantity['quantity'] -= $quantity;
+                        if ($key_and_quantity['quantity'] != "-1") {
+                            $key_and_quantity['quantity'] -= $quantity;
+                        }
                         $wpdb->update(
                             $asdk_keys,
                             array(
