@@ -58,77 +58,44 @@ function add_key_type()
 
 
 //////////////////////////////////////////////////
-register_activation_hook(__FILE__,"createtable");
-register_activation_hook(__FILE__,"createtable_sec");
-register_activation_hook(__FILE__,"createtable_third");
-function createtable()
+register_activation_hook(__FILE__,"createtables");
+function createtables()
 {
     # code...
     
     global $wpdb;
     $plugin_name_db_version = '1.0.0';
-    $table_name = $wpdb->prefix . "asdk_keys";
     $charset_collate = $wpdb->get_charset_collate();
 
+    require(ABSPATH . 'wp-admin/includes/upgrade.php');
+    
+    $table_name = $wpdb->prefix . "asdk_keys";
     $sql = "CREATE TABLE $table_name (
                 id mediumint(9) NOT NULL AUTO_INCREMENT PRIMARY KEY,
-                activation_key varchar(255) NULL UNIQUE,
-                key_type varchar(255) NULL,
+                activation_key varchar(100) NULL UNIQUE,
+                key_type varchar(100) NULL,
                 key_count int(11) NULL,
                 used BIT DEFAULT 0 NOT NULL
             ) $charset_collate;";
-    
-    // $wpdb->query($sql);
-    require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
-    dbDelta($sql);
-}
+    $wpdb->query($sql);
 
-function createtable_sec()
-{
-    # code...
-    
-    global $wpdb;
-    $plugin_name_db_version = '1.0.0';
     $table_name = $wpdb->prefix . "asdk_keys_users"; 
-    $charset_collate = $wpdb->get_charset_collate();
-
     $sql = "CREATE TABLE $table_name (
             id mediumint(9) NOT NULL AUTO_INCREMENT PRIMARY KEY,
-            activation_key varchar(255) NULL,
-            key_type varchar(255) NULL,
-            sent_to varchar(255) NULL NULL,
+            activation_key varchar(100) NULL,
+            key_type varchar(100) NULL,
+            sent_to varchar(100) NULL NULL,
             sell_date DATETIME NULL
         ) $charset_collate;";
-
-    require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
-    dbDelta($sql);
-}
-function createtable_third()
-{
-    # code...
+    $wpdb->query($sql);
     
-    global $wpdb;
-    $plugin_name_db_version = '1.0.0';
     $table_name = $wpdb->prefix . "asdk_keys_types"; 
-    $charset_collate = $wpdb->get_charset_collate();
-    
-    
     $sql = "CREATE TABLE $table_name (
             id mediumint(9) NOT NULL AUTO_INCREMENT PRIMARY KEY,
-            title varchar(255) NULL UNIQUE
+            title varchar(100) NULL UNIQUE
         ) $charset_collate;";
-
-    require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
-    dbDelta($sql);
-    // add two rows to the table if table is empty
-    if($wpdb->get_var("SELECT COUNT(*) FROM $table_name") == 0) {
-        $wpdb->insert($table_name, array('title' => 'WINDOWS10PRO'));
-        $wpdb->insert($table_name, array('title' => 'WINDOWS10FAMILY'));
-        $wpdb->insert($table_name, array('title' => 'OFFICE2021PRO'));
-    }
-    
+    $wpdb->query($sql);
 }
-
 
 
 
@@ -285,7 +252,6 @@ function asdk_order_status_pending_to_processing($order_id, $order = false)
 
                 if ($quantity <= count($keys_and_quantity)) {
                     $keys_and_quantity = array_slice($keys_and_quantity, 0, $quantity);
-                    var_dump    ($keys_and_quantity);
                     $keys_string = "";
 
                     foreach ($keys_and_quantity as $key_and_quantity) {

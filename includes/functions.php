@@ -180,7 +180,7 @@ function key_types_per_page($page, $count_per_page, $search_query = null, $searc
             );
             // get count of wc products with meta_key = key_type
             $wc_products_count = $wpdb->get_results(
-                "SELECT COUNT(*) AS total_wc_products FROM wp_postmeta WHERE meta_key = '_asdk_product_type' AND meta_value = '$title'"
+                "SELECT COUNT(*) AS total_wc_products FROM ".$wpdb->prefix."postmeta WHERE meta_key = '_asdk_product_type' AND meta_value = '$title'"
             );
 
             $output .=
