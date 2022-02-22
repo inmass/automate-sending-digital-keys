@@ -95,6 +95,11 @@ function createtables()
             title varchar(100) NULL UNIQUE
         ) $charset_collate;";
     $wpdb->query($sql);
+    if($wpdb->get_var("SELECT COUNT(*) FROM $table_name") == 0) {
+        $wpdb->insert($table_name, array('title' => 'WINDOWS10PRO'));
+        $wpdb->insert($table_name, array('title' => 'WINDOWS10FAMILY'));
+        $wpdb->insert($table_name, array('title' => 'OFFICE2021PRO'));
+    }
 }
 
 
