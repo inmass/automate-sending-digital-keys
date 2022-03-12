@@ -20,6 +20,7 @@ function asdk_callback()
     add_submenu_page("auto-send-activation-keys","Add new key","Add new key","manage_options","add-key","add_key");
     add_submenu_page("auto-send-activation-keys","Keys types","Keys types","manage_options","keys-types","keys_types");
     add_submenu_page("auto-send-activation-keys","Add new key type","Add new key type","manage_options","add-key-type","add_key_type");
+    add_submenu_page("auto-send-activation-keys","Orders","Orders","manage_options","orders","orders");
 }
 
 add_action("admin_menu","asdk_callback");
@@ -50,6 +51,11 @@ function keys_types()
 function add_key_type()
 {
     include "includes/add_key_type.php";
+}
+
+function orders()
+{
+    include "includes/orders.php";
 }
 
 
@@ -232,7 +238,7 @@ function asdk_order_status_pending_to_processing($order_id, $order = false)
 
                 // notify admin that the keys were not sent to the buyer
                 $subject = "Keys for $order_id were not sent to the buyer";
-                $message = "There are not enough keys for $product_data[asdk_type] for order $order_id. Please check the order and send the keys manually.";
+                $message = "There are not enough keys for $product_data[asdk_type] for order $order_id. because there are only $keys_count keys available. Please add more keys for $product_data[asdk_type]";
                 wp_mail( get_option('admin_email'), $subject, $message );
                 // notify admin that the keys were not sent to the buyer
 
@@ -265,35 +271,70 @@ function asdk_order_status_pending_to_processing($order_id, $order = false)
 
                     // send $quantity keys to the buyer
                     $subject = $product_data["product_title"]." - $quantity keys";
+                    $from = get_option('admin_email');
+                    $message = "Hello, thank you for trusting us.<br>";
                     if ($quantity == 1) {
-                        $message = "Here is your key for $product_data[product_title]:<br><br>";
+                        $message .= "Here is your key for $product_data[product_title]:<br><br>";
                     } else {
-                        $message = "Here are your keys for $product_data[product_title]:<br><br>";
+                        $message .= "Here are your keys for $product_data[product_title]:<br><br>";
                     }
                     $message .= $keys_string;
-                    wp_mail( $buyer['email'], $subject, $message );
+                    $message .= "<br><br>";
+                    $message .= "<p style='color: red;'>YOU CAN USE YOUR KEY ONLY ONCE!!!!!</p><br><p style='color: red;'>MAKE SURE THE KEY IS RIGHT BEFORE SUBMITTING</p>";
+                    // email as html
+                    $headers = array('Content-Type: text/html; charset=UTF-8');
+                    wp_mail( $buyer['email'], $subject, $message, $headers, array($from) );
 
                     // update key quantity in $keys_and_quantity
                     foreach ($keys_and_quantity as $key_and_quantity) {
                         if ($key_and_quantity['quantity'] != "-1") {
                             $key_and_quantity['quantity'] -= $quantity;
                         }
-                        $wpdb->update(
-                            $asdk_keys,
-                            array(
-                                'key_count' => $key_and_quantity['quantity'],
-                            ),
-                            array(
-                                'activation_key' => $key_and_quantity['key']
-                            )
-                        );
+                        if ($key_and_quantity['quantity'] == "0") {
+                            $wpdb->update(
+                                $asdk_keys,
+                                array(
+                                    'key_count' => $key_and_quantity['quantity'],
+                                    'used' => 1
+                                ),
+                                array(
+                                    'activation_key' => $key_and_quantity['key']
+                                )
+                            );
+                        } else {
+                            $wpdb->update(
+                                $asdk_keys,
+                                array(
+                                    'key_count' => $key_and_quantity['quantity'],
+                                ),
+                                array(
+                                    'activation_key' => $key_and_quantity['key']
+                                )
+                            );
+                        }
                     }
+                    // create new asdk_keys_users row
+                    $wpdb->insert(
+                        $asdk_keys_users,
+                        array(
+                            'activation_key' => $keys_string,
+                            'key_type' => $product_data["asdk_type"],
+                            'sent_to' => $buyer['email'],
+                            'sell_date' => date("Y-m-d H:i:s")
+                        )
+                    );
+
                     // send $quantity keys to the buyer
+
+                    // notify admin that the keys were sent to the buyer
+                    $subject = "Keys for $order_id were sent to the buyer";
+                    $message = "The keys for $product_data[asdk_type] for order $order_id were sent to the buyer.";
+                    wp_mail( get_option('admin_email'), $subject, $message );
 
                 } else {
                     // notify admin that the keys were not sent to the buyer
                     $subject = "Keys for $order_id were not sent to the buyer";
-                    $message = "There are not enough keys for $product_data[asdk_type] for order $order_id. Please check the order and send the keys manually.";
+                    $message = "There are not enough keys for $product_data[asdk_type] for order $order_id. because there are only " . count($keys_and_quantity) . " keys available. Please add more keys for $product_data[asdk_type] Please check the order and send the keys manually.";
                     wp_mail( get_option('admin_email'), $subject, $message );
                     // notify admin that the keys were not sent to the buyer
                 }
@@ -301,7 +342,7 @@ function asdk_order_status_pending_to_processing($order_id, $order = false)
         } else {
             // notify admin that the keys were not sent to the buyer
             $subject = "Keys for $order_id were not sent to the buyer";
-            $message = "There are no keys for $product_data[asdk_type] for order $order_id. Please check the order and send the keys manually.";
+            $message = "There are no keys for $product_data[asdk_type] for order $order_id. Please check the order and send the keys manually. because there are no keys available for $product_data[asdk_type] Please check the order and send the keys manually.";
             wp_mail( get_option('admin_email'), $subject, $message );
         }
     }
