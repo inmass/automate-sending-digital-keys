@@ -71,4 +71,39 @@ if ($_POST['form_type'] == "add_key") {
         $response = $result;
     }
     echo $response;
+} else if ($_POST['form_type'] == "add_templates") {
+    $table = $wpdb->prefix . "asdk_templates";
+    $templates = $_POST['templates'];
+    
+    if (!empty($templates)) {
+        foreach ($templates as $key => $value) {
+            $query = $wpdb->get_results("SELECT * FROM $table WHERE key_type = '$key'");
+            if (empty($query)) {
+                $result = $wpdb->insert(
+                    $table,
+                    array(
+                        'key_type' => $key,
+                        'html' => $value
+                    )
+                );
+            } else {
+                $result = $wpdb->update(
+                    $table,
+                    array(
+                        'html' => $value
+                    ),
+                    array(
+                        'key_type' => $key
+                    )
+                );
+            }
+        }
+    }
+
+    if ($result) {
+        $response = "success";
+    } else {
+        $response = $result;
+    }
+    echo $response;
 }

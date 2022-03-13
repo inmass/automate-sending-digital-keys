@@ -21,6 +21,7 @@ function asdk_callback()
     add_submenu_page("auto-send-activation-keys","Keys types","Keys types","manage_options","keys-types","keys_types");
     add_submenu_page("auto-send-activation-keys","Add new key type","Add new key type","manage_options","add-key-type","add_key_type");
     add_submenu_page("auto-send-activation-keys","Orders","Orders","manage_options","orders","orders");
+    add_submenu_page("auto-send-activation-keys","Email templates","Email templates","manage_options","email-templates","email_templates");
 }
 
 add_action("admin_menu","asdk_callback");
@@ -56,6 +57,11 @@ function add_key_type()
 function orders()
 {
     include "includes/orders.php";
+}
+
+function email_templates()
+{
+    include "includes/email_templates.php";
 }
 
 
@@ -101,6 +107,15 @@ function createtables()
             title varchar(100) NULL UNIQUE
         ) $charset_collate;";
     $wpdb->query($sql);
+
+    $table_name = $wpdb->prefix . "asdk_templates"; 
+    $sql = "CREATE TABLE $table_name (
+            id mediumint(9) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+            html text NOT NULL,
+            key_type varchar(100) NULL UNIQUE
+        ) $charset_collate;";
+    $wpdb->query($sql);
+
     if($wpdb->get_var("SELECT COUNT(*) FROM $table_name") == 0) {
         $wpdb->insert($table_name, array('title' => 'WINDOWS10PRO'));
         $wpdb->insert($table_name, array('title' => 'WINDOWS10FAMILY'));
