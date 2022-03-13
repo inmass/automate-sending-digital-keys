@@ -181,6 +181,7 @@ function asdk_order_status_pending_to_processing($order_id, $order = false)
     $asdk_keys = $wpdb->prefix."asdk_keys";
     $asdk_keys_users = $wpdb->prefix."asdk_keys_users";
     $asdk_keys_types = $wpdb->prefix."asdk_keys_types";
+    $asdk_templates = $wpdb->prefix."asdk_templates";
 
     $asdk_keys_types_query = $wpdb->get_results("SELECT * FROM $asdk_keys_types");
 
@@ -240,7 +241,8 @@ function asdk_order_status_pending_to_processing($order_id, $order = false)
         // check if product asdk_type is in keys_by_type
         if ( array_key_exists($product_data["asdk_type"], $keys_by_type)) {
 
-            $quantity = $product_data["product_quantity"];
+            // $quantity = $product_data["product_quantity"];
+            $quantity = 2;
             $keys = $keys_by_type[$product_data["asdk_type"]];
             $keys_count = count($keys_by_type[$product_data["asdk_type"]]);
 
@@ -277,25 +279,52 @@ function asdk_order_status_pending_to_processing($order_id, $order = false)
                 }
 
                 if ($quantity <= count($keys_and_quantity)) {
+                    // check if there is a template for this product type
+                    $template_query = $wpdb->get_results("SELECT * FROM $asdk_templates WHERE `key_type` = '$product_data[asdk_type]'");
                     $keys_and_quantity = array_slice($keys_and_quantity, 0, $quantity);
                     $keys_string = "";
 
+                    $count = count($keys_and_quantity);
+                    $i = 0;
                     foreach ($keys_and_quantity as $key_and_quantity) {
-                        $keys_string .= $key_and_quantity['key'] . " ";
+                        $keys_string .= $key_and_quantity['key'];
+                        if(++$i !== $count) {
+                            $keys_string .= " / ";
+                        }
                     }
 
                     // send $quantity keys to the buyer
                     $subject = $product_data["product_title"]." - $quantity keys";
                     $from = get_option('admin_email');
-                    $message = "Hello, thank you for trusting us.<br>";
-                    if ($quantity == 1) {
-                        $message .= "Here is your key for $product_data[product_title]:<br><br>";
+                    if ($template_query) {
+                        if ($template_query[0]->html != '') {
+                            $message = stripcslashes($template_query[0]->html);
+                            // replace a string in the message with the keys
+                            $message = str_replace("[THE_KEYS]", $keys_string, $message);
+                        } else {
+                            $message = "Hello, thank you for trusting us.<br>";
+                            if ($quantity == 1) {
+                                $message .= "Here is your key for $product_data[product_title]:<br><br>";
+                            } else {
+                                $message .= "Here are your keys for $product_data[product_title]:<br><br>";
+                            }
+                            $message .= $keys_string;
+                            $message .= "<br><br>";
+                            $message .= "<p style='color: red;'>YOU CAN USE YOUR KEY ONLY ONCE!!!!!</p><br><p style='color: red;'>MAKE SURE THE KEY IS RIGHT BEFORE SUBMITTING</p>";
+                        }
                     } else {
-                        $message .= "Here are your keys for $product_data[product_title]:<br><br>";
+                        $message = "Hello, thank you for trusting us.<br>";
+                        if ($quantity == 1) {
+                            $message .= "Here is your key for $product_data[product_title]:<br><br>";
+                        } else {
+                            $message .= "Here are your keys for $product_data[product_title]:<br><br>";
+                        }
+                        $message .= $keys_string;
+                        $message .= "<br><br>";
+                        $message .= "<p style='color: red;'>YOU CAN USE YOUR KEY ONLY ONCE!!!!!</p><br><p style='color: red;'>MAKE SURE THE KEY IS RIGHT BEFORE SUBMITTING</p>";
                     }
-                    $message .= $keys_string;
-                    $message .= "<br><br>";
-                    $message .= "<p style='color: red;'>YOU CAN USE YOUR KEY ONLY ONCE!!!!!</p><br><p style='color: red;'>MAKE SURE THE KEY IS RIGHT BEFORE SUBMITTING</p>";
+                    echo $message;
+                    exit;
                     // email as html
                     $headers = array('Content-Type: text/html; charset=UTF-8');
                     wp_mail( $buyer['email'], $subject, $message, $headers, array($from) );
