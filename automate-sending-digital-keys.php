@@ -241,8 +241,7 @@ function asdk_order_status_pending_to_processing($order_id, $order = false)
         // check if product asdk_type is in keys_by_type
         if ( array_key_exists($product_data["asdk_type"], $keys_by_type)) {
 
-            // $quantity = $product_data["product_quantity"];
-            $quantity = 2;
+            $quantity = $product_data["product_quantity"];
             $keys = $keys_by_type[$product_data["asdk_type"]];
             $keys_count = count($keys_by_type[$product_data["asdk_type"]]);
 
