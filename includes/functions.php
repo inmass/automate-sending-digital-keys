@@ -52,10 +52,14 @@ function key_per_page($page, $count_per_page, $search_query = null, $search_by =
             } else {
                 $used = "No";
             }
-
+            $output .= "<tr";
+            if ($used == "Yes") {
+                $output .= " class='used_key' style='background-color: #fad7d7'>";
+            } else {
+                $output .= " class='available_key'>";
+            }
             $output .=
-                "<tr>
-                    <td>" .$id ."</td>
+                "   <td>" .$id ."</td>
                     <td>" .$activation_key ."</td>
                     <td>" .$key_type ."</td>
                     <td id='key-count-$id'>

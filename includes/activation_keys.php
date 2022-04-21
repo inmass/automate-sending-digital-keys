@@ -33,7 +33,7 @@ $query = $wpdb->get_results("SELECT * FROM $tablename");
         </thead>
 
         <tbody id="content" >
-            <?php key_per_page(1,20,null,null); ?>
+            <?php key_per_page(1,40,null,null); ?>
         </tbody>
     </table>
     <div id="error"></div>

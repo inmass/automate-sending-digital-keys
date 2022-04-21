@@ -322,8 +322,7 @@ function asdk_order_status_pending_to_processing($order_id, $order = false)
                         $message .= "<br><br>";
                         $message .= "<p style='color: red;'>YOU CAN USE YOUR KEY ONLY ONCE!!!!!</p><br><p style='color: red;'>MAKE SURE THE KEY IS RIGHT BEFORE SUBMITTING</p>";
                     }
-                    echo $message;
-                    exit;
+                    
                     // email as html
                     $headers = array('Content-Type: text/html; charset=UTF-8');
                     wp_mail( $buyer['email'], $subject, $message, $headers, array($from) );
@@ -421,22 +420,22 @@ function asdk_order_status_pending_to_on_hold( $order_id ) {
 
 
 // delete plugin
-function dropTables()
-{
-    global $wpdb;
-    # code...
-    require(ABSPATH . 'wp-admin/includes/upgrade.php');
+// function dropTables()
+// {
+//     global $wpdb;
+//     # code...
+//     require(ABSPATH . 'wp-admin/includes/upgrade.php');
 
-    $table_name = $wpdb->prefix . "asdk_keys";
-    $sql = "DROP TABLE IF EXISTS $table_name";
-    $wpdb->query($sql);
-    $table_name = $wpdb->prefix . "asdk_keys_types";
-    $sql = "DROP TABLE IF EXISTS $table_name";
-    $wpdb->query($sql);
-    $table_name = $wpdb->prefix . "asdk_keys_users";
-    $sql = "DROP TABLE IF EXISTS $table_name";
-    $wpdb->query($sql);
+//     $table_name = $wpdb->prefix . "asdk_keys";
+//     $sql = "DROP TABLE IF EXISTS $table_name";
+//     $wpdb->query($sql);
+//     $table_name = $wpdb->prefix . "asdk_keys_types";
+//     $sql = "DROP TABLE IF EXISTS $table_name";
+//     $wpdb->query($sql);
+//     $table_name = $wpdb->prefix . "asdk_keys_users";
+//     $sql = "DROP TABLE IF EXISTS $table_name";
+//     $wpdb->query($sql);
 
-}
+// }
 
-register_uninstall_hook(__FILE__,"dropTables");
+// register_uninstall_hook(__FILE__,"dropTables");
