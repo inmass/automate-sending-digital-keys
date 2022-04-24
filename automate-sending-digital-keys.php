@@ -300,6 +300,7 @@ function asdk_order_status_pending_to_processing($order_id, $order = false)
                             $message = stripcslashes($template_query[0]->html);
                             // replace a string in the message with the keys
                             $message = str_replace("[THE_KEYS]", $keys_string, $message);
+                            $message = str_replace("[THE_PRODUCT]", $product_data["product_title"], $message);
                         } else {
                             $message = "Hello, thank you for trusting us.<br>";
                             if ($quantity == 1) {

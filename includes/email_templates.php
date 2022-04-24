@@ -21,6 +21,7 @@ $templates_query = $wpdb->get_results("SELECT * FROM $templates");
             <h3><?php echo $type->title; ?></h3>
             <!-- WHAT IS THE NAME OF ' -->
             <p>Please use "<b style="color: green;">[THE_KEYS]</b>" placeholder to determine where you will have your key on the text.</p>
+            <p>Please use "<b style="color: green;">[THE_PRODUCT]</b>" placeholder to determine where you will have your product name on the text.</p>
             <p><b style="color: red;">DO NOT USE SINGLE QUOTES (')</b> in the text, it will break the email. Use double quotes (") instead.</p>
             <textarea class="template_input" previous_value='<?php if(!empty($template_query)) {echo stripcslashes($template_query[0]->html);}?>' style="width: 100%;" name="<?php echo $type->title; ?>"  id="<?php echo $type->title; ?>" rows="10"><?php if(!empty($template_query)) {echo stripcslashes($template_query[0]->html);}?></textarea>
             <div id="preview_<?php echo $type->title; ?>" style="display: none; padding: 10px; background-color: white; border: 1px solid #8c8f94; border-radius: 4px">
@@ -87,7 +88,13 @@ $templates_query = $wpdb->get_results("SELECT * FROM $templates");
                 // check if the new value contains the placeholder ([THE_KEYS])
                 if (inputs[i].value.indexOf('[THE_KEYS]') == -1) {
                     // ask the user if they want to proceed
-                    if (!confirm(`The template for ${inputs[i].getAttribute('id')} does not contain the placeholder. Do you want to proceed?`)) {
+                    if (!confirm(`The template for ${inputs[i].getAttribute('id')} does not contain the "[THE_KEYS]" placeholder. Do you want to proceed?`)) {
+                        return;
+                    }
+                }
+                if (inputs[i].value.indexOf('[THE_PRODUCT]') == -1) {
+                    // ask the user if they want to proceed
+                    if (!confirm(`The template for ${inputs[i].getAttribute('id')} does not contain the "[THE_PRODUCT]" placeholder. Do you want to proceed?`)) {
                         return;
                     }
                 }
