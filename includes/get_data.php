@@ -3,10 +3,7 @@
 global $wpdb;
 if ( ! defined('ABSPATH') ) {
     /** Set up WordPress environment */
-  
-    require($_SERVER['DOCUMENT_ROOT'] . '/Woocommerce test/wp-load.php');
-
-    // require($_SERVER['DOCUMENT_ROOT'] . '/wp-load.php');
+    require($_SERVER['DOCUMENT_ROOT'] . '/wp-load.php');
 }
 
 include('functions.php');

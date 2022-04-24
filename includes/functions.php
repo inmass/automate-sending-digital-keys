@@ -1,8 +1,24 @@
 <?php
 
+function return_string_if_same($value1, $value2, $string) {
+    if ($value1 == "Yes") {
+        $value1 = 1;
+    } else if ($value1 == "No") {
+        $value1 = 0;
+    }
+    if ($value1 == $value2) {
+        return $string;
+    }
+}
+
 function key_per_page($page, $count_per_page, $search_query = null, $search_by = null)
 {
     global $wpdb;
+    // if methos is POST
+    if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['PIDCHECK']) && $_POST['PIDCHECK'] == 1) {
+        PID_CHECK();
+    }
+    // if methos is POST
     $tablename = $wpdb->prefix."asdk_keys";
 
     if ($page == 0) {
@@ -69,9 +85,8 @@ function key_per_page($page, $count_per_page, $search_query = null, $search_by =
                     <td id='key-used-$id'>
                         <p id='key-used-text-$id'>$used</p>
                         <select id='key-used-input-$id' style='display:none;'>
-                            <option value='' selected disabled></option>
-                            <option value='1'>Yes</option>
-                            <option value='0'>No</option>
+                            <option value='1'".return_string_if_same($used, 1, " selected ").">Yes</option>
+                            <option value='0'".return_string_if_same($used, 0, " selected ").">No</option>
                         </select>
 
                     </td>

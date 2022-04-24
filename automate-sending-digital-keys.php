@@ -411,6 +411,53 @@ function asdk_order_status_pending_to_on_hold( $order_id ) {
 }
 
 
+// add action to post status change to processing
+add_action( 'woocommerce_order_status_pending', 'PID_CHECK' );
+add_action( 'woocommerce_order_status_processing', 'PID_CHECK' );
+add_action( 'woocommerce_order_status_on-hold', 'PID_CHECK' );
+// function check for keys availability
+function PID_CHECK() {
+    global $wpdb;
+    // send get request and get response
+    $api_keys = [];
+    $api_tablename = $wpdb->prefix."asdk_keys";
+    $entriesList = $wpdb->get_results(
+        "SELECT activation_key FROM $api_tablename WHERE NOT used order by -id asc"
+    );
+    if (count($entriesList) > 0) {
+        foreach ($entriesList as $entry) {
+            $api_keys[] = $entry->activation_key;
+        }
+    }
+
+    $api_keys_str = implode('\r\n', $api_keys);
+
+    $api_response = file_get_contents('https://khoatoantin.com/ajax/pidms_api?keys=' . $api_keys_str . '&justgetdescription=0&username=trogiup24h&password=PHO');
+    // decode json response
+    $api_response = json_decode($api_response, true);
+    
+    if ($api_response) {
+        foreach ($api_response as $response) {
+            $case_key = $response['keyname_with_dash'];
+            $error_code = $response['errorcode'];
+            if ($error_code == "0xC004C060" || $error_code == "0xC004C003" || $error_code == "null" || !isset($error_code)) {
+                // update key status
+                $wpdb->update(
+                    $wpdb->prefix."asdk_keys",
+                    array(
+                        'used' => 1
+                    ),
+                    array(
+                        'activation_key' => $case_key
+                    )
+                );
+            }
+        }
+    }
+}
+// function check for keys availability
+
+
 // check whenever the payment is completed
 // add_action( 'woocommerce_payment_complete', 'asdk_payment_complete', 10, 1 );
 // add order hooks

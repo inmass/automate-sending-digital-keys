@@ -20,6 +20,17 @@ $query = $wpdb->get_results("SELECT * FROM $tablename");
 
 <div>
     <h1>Activation keys</h1>
+    <div>
+        <form method="post">
+            <input type="hidden" name="PIDCHECK" value=1>
+            <button type="submit">PID check keys</button>
+            <br>
+            <small>The PID check will check your keys and remove any that are invalid (invalid codes: 0xC004C060 and 0xC004C003)</small>
+            <br>
+            <small>The PID Check may sometimes run into problems, so you may as well want to check your keys manually if you encounter a problem.</small>
+        </form>
+    </div>
+    <br>
     <table width='100%' border='1' class="wp-list-table widefat fixed striped pages " style='border-collapse: collapse;'>
         <thead>
             <tr>
@@ -190,6 +201,7 @@ $query = $wpdb->get_results("SELECT * FROM $tablename");
         let count_input = document.getElementById('key-count-input-'+id)
         let used_text = document.getElementById('key-used-text-'+id)
         let used_input = document.getElementById('key-used-input-'+id)
+        let cancel_button = document.getElementById('cancel-button-'+id)
 
         if (count_input.value == "") {
             alert('Please enter key count (type in -1 to use it with no count limit)');
@@ -242,13 +254,19 @@ $query = $wpdb->get_results("SELECT * FROM $tablename");
 
         if ($used == 0) {
             used_text.innerText = 'No';
+            // set class name to parent of parent of used_text
+            used_text.parentElement.parentElement.className = 'available_key';
+            used_text.parentElement.parentElement.style = '';
         } else {
             used_text.innerText = 'Yes';
+            used_text.parentElement.parentElement.className = 'used_key';
+            used_text.parentElement.parentElement.style = 'background-color: #fad7d7;';
         }
 
         count_text.style.display = 'block';
         used_text.style.display = 'block';
         edit_button.style.display = 'block';
+        cancel_button.style.display = 'none';
 
     }
 </script>
