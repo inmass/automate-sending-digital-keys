@@ -17,8 +17,6 @@ if ($_POST['form_type'] == "add_key") {
     } else {
         $key_count = -1;
     }
-    // var_dump($_POST['is_microsoft_key']);
-    // exit;
     $reult = $wpdb->insert(
         $table,
         array(

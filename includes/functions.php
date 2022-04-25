@@ -108,7 +108,7 @@ function key_per_page($page, $count_per_page, $search_query = null, $search_by =
         }
         $output .= '
             <tr>
-                <td colspan="6">
+                <td colspan="7">
                     <ul class="pagination" style="display:flex;justify-content: space-between;">
                         <li >
         ';

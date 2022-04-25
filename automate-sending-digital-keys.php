@@ -36,31 +36,37 @@ function asdk_home()
 
 function activation_keys()
 {
+    $js_file = plugins_url('assets/js/activation_keys.js', __FILE__);
     include "includes/activation_keys.php";
 }
 
 function add_key()
 {
+    $js_file = plugins_url('assets/js/add_key.js', __FILE__);
     include "includes/add_key.php";
 }
 
 function keys_types()
 {
+    $js_file = plugins_url('assets/js/keys_types.js', __FILE__);
     include "includes/keys_types.php";
 }
 
 function add_key_type()
 {
+    $js_file = plugins_url('assets/js/add_key_type.js', __FILE__);
     include "includes/add_key_type.php";
 }
 
 function orders()
 {
+    $js_file = plugins_url('assets/js/orders.js', __FILE__);
     include "includes/orders.php";
 }
 
 function email_templates()
 {
+    $js_file = plugins_url('assets/js/email_templates.js', __FILE__);
     include "includes/email_templates.php";
 }
 
@@ -431,8 +437,6 @@ function PID_CHECK() {
             $api_keys[] = $entry->activation_key;
         }
     }
-    var_dump($api_keys);
-    exit;
 
     $api_keys_str = implode('\r\n', $api_keys);
 
