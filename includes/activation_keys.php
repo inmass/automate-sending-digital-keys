@@ -37,6 +37,7 @@ $query = $wpdb->get_results("SELECT * FROM $tablename");
                 <th>Id</th>
                 <th>Activation key</th>
                 <th>Key type</th>
+                <th>Microsft key</th>
                 <th>Key count</th>
                 <th>Used</th>
                 <th>Action</th>

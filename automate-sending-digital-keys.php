@@ -87,6 +87,7 @@ function createtables()
                 activation_key varchar(100) NULL UNIQUE,
                 key_type varchar(100) NULL,
                 key_count int(11) NULL,
+                is_microsoft_key BIT DEFAULT 1 NOT NULL,
                 used BIT DEFAULT 0 NOT NULL
             ) $charset_collate;";
     $wpdb->query($sql);
@@ -423,13 +424,15 @@ function PID_CHECK() {
     $api_keys = [];
     $api_tablename = $wpdb->prefix."asdk_keys";
     $entriesList = $wpdb->get_results(
-        "SELECT activation_key FROM $api_tablename WHERE NOT used order by -id asc"
+        "SELECT activation_key FROM $api_tablename WHERE NOT used AND is_microsoft_key order by -id asc"
     );
     if (count($entriesList) > 0) {
         foreach ($entriesList as $entry) {
             $api_keys[] = $entry->activation_key;
         }
     }
+    var_dump($api_keys);
+    exit;
 
     $api_keys_str = implode('\r\n', $api_keys);
 

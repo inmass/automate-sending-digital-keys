@@ -61,6 +61,7 @@ function key_per_page($page, $count_per_page, $search_query = null, $search_by =
             $id = $entry->id;
             $activation_key = $entry->activation_key;
             $key_type = $entry->key_type;
+            $is_microsoft_key = $entry->is_microsoft_key;
             $key_count = $entry->key_count;
             $used = $entry->used;
             if ($used == 1) {
@@ -74,10 +75,16 @@ function key_per_page($page, $count_per_page, $search_query = null, $search_by =
             } else {
                 $output .= " class='available_key'>";
             }
+            if ($is_microsoft_key == 1) {
+                $is_microsoft_key = "Yes";
+            } else {
+                $is_microsoft_key = "No";
+            }
             $output .=
                 "   <td>" .$id ."</td>
                     <td>" .$activation_key ."</td>
                     <td>" .$key_type ."</td>
+                    <td>" .$is_microsoft_key ."</td>
                     <td id='key-count-$id'>
                         <p id='key-count-text-$id'>$key_count</p>
                         <input type='number' id='key-count-input-$id' value='$key_count' style='display:none;'>
