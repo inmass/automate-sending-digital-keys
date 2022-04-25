@@ -17,12 +17,15 @@ if ($_POST['form_type'] == "add_key") {
     } else {
         $key_count = -1;
     }
+    // var_dump($_POST['is_microsoft_key']);
+    // exit;
     $reult = $wpdb->insert(
         $table,
         array(
             'activation_key' => $_POST['activation_key'],
             'key_type' => $_POST['key_type'],
             'key_count' => $key_count,
+            'is_microsoft_key' => 1 ? ($_POST['is_microsoft_key'] == '1') : 0,
         )
     );
     if ($reult) {

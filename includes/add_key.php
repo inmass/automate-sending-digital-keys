@@ -26,6 +26,9 @@ $query = $wpdb->get_results("SELECT `title` FROM $tablename");
         <br>
         <input type="number" name="key_count" id="key_count" step="1" required>
         <br><br>
+        <input type="checkbox" name="is_microsoft_key" id="is_microsoft_key" checked='true'>
+        <label for="is_microsoft_key">This is a Microsft key (This will make the key eligible for the PID check)</label>
+        <br><br>
         <input type="submit" value="Add key">
     </form>
     <div id="error" style="color: red;"></div>
@@ -44,11 +47,19 @@ $query = $wpdb->get_results("SELECT `title` FROM $tablename");
         if (key_count == "") {
             key_count = null;
         }
+        let is_microsoft_key_checked = document.getElementById('is_microsoft_key').checked;
+        let is_microsoft_key;
+        if (is_microsoft_key_checked) {
+            is_microsoft_key = 1;
+        } else {
+            is_microsoft_key = 0;
+        }
         let formData = new FormData(form);
         formData.append('form_type', 'add_key');
         formData.append('key_type', key_type);
         formData.append('activation_key', activation_key);
         formData.append('key_count', key_count);
+        formData.append('is_microsoft_key', is_microsoft_key);
         jQuery.ajax({
             type:'POST',
             data:formData,
