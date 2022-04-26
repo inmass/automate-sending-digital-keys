@@ -252,9 +252,7 @@ function asdk_order_status_pending_to_processing($order_id, $order = false)
             $keys = $keys_by_type[$product_data["asdk_type"]];
             $keys_count = count($keys_by_type[$product_data["asdk_type"]]);
 
-            echo $product_data["product_title"] . ": " . $quantity . "<br>";
-            echo "Product type: " . $product_data["asdk_type"] . "<br>";
-            echo "Available keys for $product_data[asdk_type]: " . $keys_count . "<br>";
+            
 
             // if there are enough keys for this product type
             if ($quantity > $keys_count) {
@@ -302,12 +300,22 @@ function asdk_order_status_pending_to_processing($order_id, $order = false)
                     // send $quantity keys to the buyer
                     $subject = $product_data["product_title"]." - $quantity keys";
                     $from = get_option('admin_email');
+                    $product_name = $product_data["product_title"];
+
+                    // check if product has _product_display_name meta data (wc-cart-product-name-editor plugin)
+                    $product_display_name = get_post_meta( $product_data["product_id"], '_product_display_name', true );
+                    if ( $product_display_name && $product_display_name != '' ) {
+                        $product_name = $product_display_name;
+                    }
+                    // check if product has _product_display_name meta data (wc-cart-product-name-editor plugin)
+                    
+                    $product_title = $product_data["product_title"];
                     if ($template_query) {
                         if ($template_query[0]->html != '') {
                             $message = stripcslashes($template_query[0]->html);
                             // replace a string in the message with the keys
                             $message = str_replace("[THE_KEYS]", $keys_string, $message);
-                            $message = str_replace("[THE_PRODUCT]", $product_data["product_title"], $message);
+                            $message = str_replace("[THE_PRODUCT]", $product_name, $message);
                         } else {
                             $message = "Hello, thank you for trusting us.<br>";
                             if ($quantity == 1) {
