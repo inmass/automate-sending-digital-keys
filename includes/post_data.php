@@ -104,4 +104,11 @@ if ($_POST['form_type'] == "add_key") {
         $response = $result;
     }
     echo $response;
+} else if ($_POST['form_type'] == "activate") {
+    if ($_POST['status'] == "cow") {
+        update_option('wc_is__activated', 1);
+    } else {
+        update_option('wc_is__activated', 0);
+    }
+    echo "success";
 }
